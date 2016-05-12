@@ -53,6 +53,7 @@ namespace MusicSorter
                 listOfDuplicates.RemoveRange(1, listOfDuplicates.Count - 1);
         }
 
+
         public void AddSongsToFolders()
         {
             foreach (var song in ListOfSongs.ToList())
@@ -68,6 +69,8 @@ namespace MusicSorter
 
                 if (!File.Exists(combinedPath))
                     File.Copy(song.FilePath, combinedPath);
+
+                HelperMethods.DrawTextProgressBar(song.SongId, ListOfSongs.Count);
             }
         }
 
