@@ -9,8 +9,6 @@ namespace MusicSorter
     public static class CacheXml
     {
         private const string _cacheXmlFile = "ListOfSongsXML";
-        private const string debugFolderPath = @"C:\Users\Mario\Documents\Visual Studio 2015\Projects\MusicSorter\MusicSorter\bin\Debug";
-        private const string fullPath = @"C:\Users\Mario\Documents\Visual Studio 2015\Projects\MusicSorter\MusicSorter\bin\Debug\ListOfSongsXML";
         public static bool DoesCacheExists => File.Exists(_cacheXmlFile);
 
         public static void SaveData(object obj, string filename)
