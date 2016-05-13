@@ -37,7 +37,7 @@ namespace MusicSorter
             //TODO
         }
 
-        public static void RefreshCache()
+        public static void UpdateCache()
         {
             //TODO
         }

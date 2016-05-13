@@ -11,22 +11,23 @@ namespace MusicSorter
     {
         public List<Song> ListOfSongs { get; set; }
         public string MessyFolderPath { get; set; }
-        public string CleanNewFolderPath { get; set; }
+        public string CleanNewFolderPath { private get; set; }
         
-        private static string SterilizeAlbumName(string albumName)
+        private static string SterilizeAlbumName(string property)
         {
-            var regex = new Regex("[^a-zA-Z0-9 -]");
-            albumName = regex.Replace(albumName, "");
-            return albumName;
+            return new Regex("[^a-zA-Z0-9 -]").Replace(property, "");
         }
 
-        public void CreateFolders(List<Song> cachedListOfAlbums = null)
+        public void CreateFolders()
         {
-            var listOfSongs = cachedListOfAlbums ?? ListOfSongs;
-
-            foreach (var song in listOfSongs)
+            foreach (var song in ListOfSongs)
             {
+                if(song.Artist == null) continue;
+                
+
+
                 if (song.Album == null) continue;
+
                 var albumName = SterilizeAlbumName(song.Album);
                 var newFolderPath = Path.Combine(CleanNewFolderPath, albumName);
 
@@ -36,8 +37,7 @@ namespace MusicSorter
         
         private void CheckForDuplicate(string songTitle)
         {
-            var listOfDuplicates = ListOfSongs
-                .Where(x => x.Name != null && x.Name.Equals(songTitle)).ToList();
+            var listOfDuplicates = ListOfSongs.Where(x => x.Name != null && x.Name.Equals(songTitle)).ToList();
 
             if (listOfDuplicates.Count == 1) return; 
 
@@ -54,14 +54,14 @@ namespace MusicSorter
         }
 
 
-        public void AddSongsToFolders()
+        public void AddSongsToFolders(int count)
         {
             foreach (var song in ListOfSongs.ToList())
             {
-                if (song.Album == null) continue;
-                var albumName = SterilizeAlbumName(song.Album);
-
                 if (song.FilePath == null) continue;
+                if (song.Album == null) continue;
+
+                var albumName = SterilizeAlbumName(song.Album);
                 var combinedName = Path.Combine(CleanNewFolderPath, albumName);
                 var combinedPath = Path.Combine(combinedName, Path.GetFileName(song.FilePath));
 
@@ -70,7 +70,7 @@ namespace MusicSorter
                 if (!File.Exists(combinedPath))
                     File.Copy(song.FilePath, combinedPath);
 
-                HelperMethods.DrawTextProgressBar(song.SongId, ListOfSongs.Count);
+                HelperMethods.DrawTextProgressBar(song.SongId, count);
             }
         }
 

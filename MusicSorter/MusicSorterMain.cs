@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace MusicSorter
@@ -10,6 +11,10 @@ namespace MusicSorter
         {
             const string fromPath = @"D:\Music\";
             const string toPath = @"D:\Sorted Music 2";
+
+            var stopWatch = new Stopwatch();
+
+            stopWatch.Start();
 
             var ribs = new ActionJackson
             {
@@ -39,9 +44,15 @@ namespace MusicSorter
             ribs.CreateFolders();
             Console.WriteLine("Done.");
 
+            var count = ribs.ListOfSongs.Count;
+
             Console.WriteLine("Sorting Songs Into Folders. . . ");
-            ribs.AddSongsToFolders();
+            ribs.AddSongsToFolders(count);
             Console.WriteLine("Done.");
+
+            stopWatch.Stop();
+
+            Console.WriteLine(stopWatch.Elapsed);
 
             Console.ReadLine();
         }
