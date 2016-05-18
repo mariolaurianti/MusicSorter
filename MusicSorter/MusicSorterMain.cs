@@ -10,7 +10,7 @@ namespace MusicSorter
         private static void Main()
         {
             const string fromPath = @"D:\Music\";
-            const string toPath = @"D:\Sorted Music 2";
+            const string toPath = @"D:\Sorted Music 3";
 
             var stopWatch = new Stopwatch();
 

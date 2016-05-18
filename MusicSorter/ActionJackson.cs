@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,34 +13,49 @@ namespace MusicSorter
         public List<Song> ListOfSongs { get; set; }
         public string MessyFolderPath { get; set; }
         public string CleanNewFolderPath { private get; set; }
-        
-        private static string SterilizeAlbumName(string property)
+
+        private static string SterilizeString(string property)
         {
-            return new Regex("[^a-zA-Z0-9 -]").Replace(property, "");
+            var regex = new Regex("[^a-zA-Z0-9 -]").Replace(property, string.Empty).Trim();
+            return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(regex).Replace(".", string.Empty);
+        }
+
+        private void CreateArtistFolder(Song song)
+        {
+            var artistClean = SterilizeString(song.Artist);
+            var newFolderPath = Path.Combine(CleanNewFolderPath, artistClean);
+
+            Directory.CreateDirectory(newFolderPath);
+            if(song.Album != null)
+                CreateAlbumFolder(song, true);
+        }
+
+        private void CreateAlbumFolder(Song song, bool fromArtist)
+        {
+            var newFolderPath = "";
+            var albumClean = SterilizeString(song.Album);
+            newFolderPath = fromArtist ? 
+                Path.Combine(CleanNewFolderPath + @"\" + song.Artist, albumClean) : 
+                Path.Combine(CleanNewFolderPath + @"\" + @"Unknown Artists", albumClean);
+            Directory.CreateDirectory(newFolderPath);
         }
 
         public void CreateFolders()
         {
             foreach (var song in ListOfSongs)
             {
-                if(song.Artist == null) continue;
-                
-
-
-                if (song.Album == null) continue;
-
-                var albumName = SterilizeAlbumName(song.Album);
-                var newFolderPath = Path.Combine(CleanNewFolderPath, albumName);
-
-                Directory.CreateDirectory(newFolderPath);
+                if (song.Artist != null)
+                    CreateArtistFolder(song);
+                else if (song.Album != null)
+                    CreateAlbumFolder(song, false);
             }
         }
-        
+
         private void CheckForDuplicate(string songTitle)
         {
             var listOfDuplicates = ListOfSongs.Where(x => x.Name != null && x.Name.Equals(songTitle)).ToList();
 
-            if (listOfDuplicates.Count == 1) return; 
+            if (listOfDuplicates.Count == 1) return;
 
             foreach (var duplicate in listOfDuplicates.ToList())
             {
@@ -49,7 +65,7 @@ namespace MusicSorter
                 listOfDuplicates.Remove(duplicate);
             }
 
-            if(listOfDuplicates.Count > 1)
+            if (listOfDuplicates.Count > 1)
                 listOfDuplicates.RemoveRange(1, listOfDuplicates.Count - 1);
         }
 
@@ -61,7 +77,7 @@ namespace MusicSorter
                 if (song.FilePath == null) continue;
                 if (song.Album == null) continue;
 
-                var albumName = SterilizeAlbumName(song.Album);
+                var albumName = SterilizeString(song.Album);
                 var combinedName = Path.Combine(CleanNewFolderPath, albumName);
                 var combinedPath = Path.Combine(combinedName, Path.GetFileName(song.FilePath));
 
@@ -107,8 +123,12 @@ namespace MusicSorter
 
                     ListOfSongs.Add(songInformation);
                 }
-                catch (UnsupportedFormatException) {}
-                catch (CorruptFileException) { }
+                catch (UnsupportedFormatException)
+                {
+                }
+                catch (CorruptFileException)
+                {
+                }
             }
         }
     }
