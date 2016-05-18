@@ -16,7 +16,7 @@ namespace MusicSorter
 
         private static string SterilizeString(string property)
         {
-            var regex = new Regex(@"[^a-zA-Z\.0-9 -]").Replace(property, string.Empty).Trim();
+            var regex = new Regex("[^a-zA-Z0-9 ]").Replace(property, string.Empty).Trim();
             regex = regex.Replace(".", string.Empty);
             return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(regex);
         }
@@ -28,15 +28,15 @@ namespace MusicSorter
 
             Directory.CreateDirectory(newFolderPath);
             if(song.Album != null)
-                CreateAlbumFolder(song, true);
+                CreateAlbumFolder(song, true, artistClean);
         }
 
-        private void CreateAlbumFolder(Song song, bool fromArtist)
+        private void CreateAlbumFolder(Song song, bool fromArtist, string artistClean = null)
         {
             var newFolderPath = "";
             var albumClean = SterilizeString(song.Album);
             newFolderPath = fromArtist ? 
-                Path.Combine(CleanNewFolderPath + @"\", albumClean) : 
+                Path.Combine(CleanNewFolderPath + @"\" + artistClean + @"\", albumClean) : 
                 Path.Combine(CleanNewFolderPath + @"\" + @"Unknown Artist", albumClean);
             Directory.CreateDirectory(newFolderPath);
         }

@@ -44,11 +44,11 @@ namespace MusicSorter
             ribs.CreateFolders();
             Console.WriteLine("Done.");
 
-            var count = ribs.ListOfSongs.Count;
-
-            Console.WriteLine("Sorting Songs Into Folders. . . ");
-            ribs.AddSongsToFolders(count);
-            Console.WriteLine("Done.");
+            //var count = ribs.ListOfSongs.Count;
+            //
+            //Console.WriteLine("Sorting Songs Into Folders. . . ");
+            //ribs.AddSongsToFolders(count);
+            //Console.WriteLine("Done.");
 
             stopWatch.Stop();
 
