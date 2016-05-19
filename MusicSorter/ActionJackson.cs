@@ -16,6 +16,8 @@ namespace MusicSorter
 
         private static string SterilizeString(string property)
         {
+            if (string.IsNullOrEmpty(property)) return string.Empty;
+
             var regex = new Regex("[^a-zA-Z0-9 ]").Replace(property, string.Empty).Trim();
             regex = regex.Replace(".", string.Empty);
             return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(regex);
@@ -23,21 +25,20 @@ namespace MusicSorter
 
         private void CreateArtistFolder(Song song)
         {
-            var artistClean = SterilizeString(song.Artist);
-            var newFolderPath = Path.Combine(CleanNewFolderPath, artistClean);
+            var newFolderPath = Path.Combine(CleanNewFolderPath, song.Artist);
 
             Directory.CreateDirectory(newFolderPath);
 
-            if(!string.IsNullOrEmpty(song.Album))
-                CreateAlbumFolder(song, song.HasArtist, artistClean);
+            if (!string.IsNullOrEmpty(song.Album))
+                CreateAlbumFolder(song, song.HasArtist, song.Artist);
         }
 
         private void CreateAlbumFolder(Song song, bool fromArtist, string artistClean = null)
         {
-            var albumClean = SterilizeString(song.Album);
-            var newFolderPath = fromArtist ? 
-                Path.Combine(CleanNewFolderPath + @"\" + artistClean + @"\", albumClean) : 
-                Path.Combine(CleanNewFolderPath + @"\" + @"Unknown Artist", albumClean);
+            var newFolderPath = fromArtist
+                ? Path.Combine($@"{CleanNewFolderPath}\", $@"{artistClean}\", song.Album)
+                : Path.Combine($@"{CleanNewFolderPath}\Unknown Artist", song.Album);
+
             Directory.CreateDirectory(newFolderPath);
         }
 
@@ -54,7 +55,8 @@ namespace MusicSorter
 
         private void CheckForDuplicate(string songTitle)
         {
-            var listOfDuplicates = ListOfSongs.Where(x => x.Name != null && x.Name.Equals(songTitle)).ToList();
+            var listOfDuplicates =
+                ListOfSongs.Where(x => !string.IsNullOrEmpty(x.Name) && x.Name.Equals(songTitle)).ToList();
 
             if (listOfDuplicates.Count.Equals(1)) return;
 
@@ -70,16 +72,19 @@ namespace MusicSorter
                 listOfDuplicates.RemoveRange(1, listOfDuplicates.Count - 1);
         }
 
-
         public void AddSongsToFolders(int count)
         {
+            const string unknownArtist = "Unknown Artist";
             foreach (var song in ListOfSongs.ToList())
             {
                 if (string.IsNullOrEmpty(song.FilePath)) continue;
                 if (string.IsNullOrEmpty(song.Album)) continue;
 
                 var albumName = SterilizeString(song.Album);
-                var combinedName = Path.Combine(CleanNewFolderPath, albumName);
+                var combinedName = song.HasArtist
+                    ? Path.Combine(CleanNewFolderPath, song.Artist, albumName)
+                    : Path.Combine(CleanNewFolderPath, unknownArtist, albumName);
+
                 var combinedPath = Path.Combine(combinedName, Path.GetFileName(song.FilePath));
 
                 CheckForDuplicate(song.Name);
@@ -116,14 +121,14 @@ namespace MusicSorter
                     var songInformation = new Song
                     {
                         SongId = factory.Create(ListOfSongs),
-                        Album = fileInformation.Tag.Album,
-                        Artist = fileInformation.Tag.FirstAlbumArtist,
-                        Name = fileInformation.Tag.Title,
+                        Album = SterilizeString(fileInformation.Tag.Album),
+                        Artist = SterilizeString(fileInformation.Tag.FirstAlbumArtist),
+                        Name = SterilizeString(fileInformation.Tag.Title),
                         FilePath = Path.GetFullPath(file),
                         HasArtist = !string.IsNullOrEmpty(fileInformation.Tag.FirstAlbumArtist)
                     };
 
-                     ListOfSongs.Add(songInformation);
+                    ListOfSongs.Add(songInformation);
                 }
                 catch (UnsupportedFormatException)
                 {

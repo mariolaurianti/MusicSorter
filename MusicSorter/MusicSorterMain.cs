@@ -9,12 +9,11 @@ namespace MusicSorter
     {
         private static void Main()
         {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+
             const string fromPath = @"D:\Music\";
             const string toPath = @"D:\Sorted Music 3";
-
-            var stopWatch = new Stopwatch();
-
-            stopWatch.Start();
 
             var ribs = new ActionJackson
             {
@@ -27,32 +26,28 @@ namespace MusicSorter
             {
                 Console.WriteLine("Retrieving Song Information. . .");
                 ribs.ImportSongInformation(ribs.MessyFolderPath);
-
-                Console.WriteLine("Done.");
-
+                
                 CacheXml.SaveData(ribs.ListOfSongs, "ListOfSongsXML");
             }
             else
             {
                 Console.WriteLine("Reading From Cache. . .");
                 ribs.ListOfSongs = CacheXml.RetrieveData();
-                Console.WriteLine("Done.");
             }
 
 
             Console.WriteLine("Creating Folders. . .");
             ribs.CreateFolders();
-            Console.WriteLine("Done.");
 
-            //var count = ribs.ListOfSongs.Count;
-            //
-            //Console.WriteLine("Sorting Songs Into Folders. . . ");
-            //ribs.AddSongsToFolders(count);
-            //Console.WriteLine("Done.");
+            Console.WriteLine($"Time Elapsed: {stopWatch.Elapsed} seconds");
+            
+            var count = ribs.ListOfSongs.Count;
+
+            Console.WriteLine("Sorting Songs Into Folders. . . ");
+            ribs.AddSongsToFolders(count);
 
             stopWatch.Stop();
 
-            Console.WriteLine(stopWatch.Elapsed);
 
             Console.ReadLine();
         }
