@@ -27,8 +27,9 @@ namespace MusicSorter
             var newFolderPath = Path.Combine(CleanNewFolderPath, artistClean);
 
             Directory.CreateDirectory(newFolderPath);
-            if(song.Album != null)
-                CreateAlbumFolder(song, true, artistClean);
+
+            if(!string.IsNullOrEmpty(song.Album))
+                CreateAlbumFolder(song, song.HasArtist, artistClean);
         }
 
         private void CreateAlbumFolder(Song song, bool fromArtist, string artistClean = null)
@@ -44,9 +45,9 @@ namespace MusicSorter
         {
             foreach (var song in ListOfSongs)
             {
-                if (song.Artist != null)
+                if (song.HasArtist)
                     CreateArtistFolder(song);
-                else if (song.Album != null)
+                else if (!string.IsNullOrEmpty(song.Album))
                     CreateAlbumFolder(song, false);
             }
         }
@@ -74,8 +75,8 @@ namespace MusicSorter
         {
             foreach (var song in ListOfSongs.ToList())
             {
-                if (song.FilePath == null) continue;
-                if (song.Album == null) continue;
+                if (string.IsNullOrEmpty(song.FilePath)) continue;
+                if (string.IsNullOrEmpty(song.Album)) continue;
 
                 var albumName = SterilizeString(song.Album);
                 var combinedName = Path.Combine(CleanNewFolderPath, albumName);
