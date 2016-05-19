@@ -33,9 +33,8 @@ namespace MusicSorter
 
         private void CreateAlbumFolder(Song song, bool fromArtist, string artistClean = null)
         {
-            var newFolderPath = "";
             var albumClean = SterilizeString(song.Album);
-            newFolderPath = fromArtist ? 
+            var newFolderPath = fromArtist ? 
                 Path.Combine(CleanNewFolderPath + @"\" + artistClean + @"\", albumClean) : 
                 Path.Combine(CleanNewFolderPath + @"\" + @"Unknown Artist", albumClean);
             Directory.CreateDirectory(newFolderPath);
@@ -56,7 +55,7 @@ namespace MusicSorter
         {
             var listOfDuplicates = ListOfSongs.Where(x => x.Name != null && x.Name.Equals(songTitle)).ToList();
 
-            if (listOfDuplicates.Count == 1) return;
+            if (listOfDuplicates.Count.Equals(1)) return;
 
             foreach (var duplicate in listOfDuplicates.ToList())
             {
@@ -95,7 +94,7 @@ namespace MusicSorter
         {
             foreach (var folder in Directory.GetDirectories(folderPath))
             {
-                var hasLength = Directory.GetDirectories(Path.GetFullPath(folder)).Length == 0;
+                var hasLength = Directory.GetDirectories(Path.GetFullPath(folder)).Length.Equals(0);
                 if (hasLength)
                     GetSongInformationForAllFilesInFolder(folder);
                 else
@@ -119,10 +118,11 @@ namespace MusicSorter
                         Album = fileInformation.Tag.Album,
                         Artist = fileInformation.Tag.FirstAlbumArtist,
                         Name = fileInformation.Tag.Title,
-                        FilePath = Path.GetFullPath(file)
+                        FilePath = Path.GetFullPath(file),
+                        HasArtist = !string.IsNullOrEmpty(fileInformation.Tag.FirstAlbumArtist)
                     };
 
-                    ListOfSongs.Add(songInformation);
+                     ListOfSongs.Add(songInformation);
                 }
                 catch (UnsupportedFormatException)
                 {

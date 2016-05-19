@@ -11,5 +11,6 @@ namespace MusicSorter
         public string Artist { get; set; }
         public string Album { get; set; }
         public string FilePath { get; set; }
+        public bool HasArtist { get; set; }
     }
 }
