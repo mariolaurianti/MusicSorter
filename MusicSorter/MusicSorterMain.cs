@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using static System.Console;
+using static MusicSorter.CacheXml;
 
 namespace MusicSorter
 {
@@ -22,34 +23,41 @@ namespace MusicSorter
                 ListOfSongs = new List<Song>()
             };
 
-            if (!CacheXml.DoesCacheExists)
+            if (!DoesCacheExists)
             {
-                Console.WriteLine("Retrieving Song Information. . .");
+                WriteLine("Retrieving Song Information. . .");
                 ribs.ImportSongInformation(ribs.MessyFolderPath);
                 
-                CacheXml.SaveData(ribs.ListOfSongs, "ListOfSongsXML");
+                SaveData(ribs.ListOfSongs, "ListOfSongsXML");
             }
             else
             {
-                Console.WriteLine("Reading From Cache. . .");
-                ribs.ListOfSongs = CacheXml.RetrieveData();
+                if (IsCacheInSync)
+                {
+                    WriteLine("Reading From Cache. . .");
+                    ribs.ListOfSongs = LoadCachedData();
+                }
+                else
+                {
+                    UpdateCache();
+                    ribs.ListOfSongs = LoadCachedData();
+                }
             }
 
-
-            Console.WriteLine("Creating Folders. . .");
+            WriteLine("Creating Folders. . .");
             ribs.CreateFolders();
 
-            Console.WriteLine($"Time Elapsed: {stopWatch.Elapsed} seconds");
+            WriteLine($"Time Elapsed: {stopWatch.Elapsed} seconds");
             
             var count = ribs.ListOfSongs.Count;
 
-            Console.WriteLine("Sorting Songs Into Folders. . . ");
+            WriteLine("Sorting Songs Into Folders. . . ");
             ribs.AddSongsToFolders(count);
 
             stopWatch.Stop();
 
 
-            Console.ReadLine();
+            ReadLine();
         }
     }
 }

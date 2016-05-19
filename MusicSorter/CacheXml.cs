@@ -10,6 +10,7 @@ namespace MusicSorter
     {
         private const string _cacheXmlFile = "ListOfSongsXML";
         public static bool DoesCacheExists => File.Exists(_cacheXmlFile);
+        public static bool IsCacheInSync => ValidateCache();
 
         public static void SaveData(object obj, string filename)
         {
@@ -19,7 +20,7 @@ namespace MusicSorter
             writer.Close();
         }
 
-        public static List<Song> RetrieveData()
+        public static List<Song> LoadCachedData()
         {
             if (!DoesCacheExists) return null;
 
@@ -37,9 +38,15 @@ namespace MusicSorter
             //TODO
         }
 
-        public static void UpdateCache()
+        public static bool ValidateCache()
         {
             //TODO
+            return true;
+        }
+
+        public static void UpdateCache()
+        {
+            
         }
     }
 }
