@@ -13,14 +13,15 @@ namespace MusicSorter
         public List<Song> ListOfSongs { get; set; }
         public string MessyFolderPath { get; set; }
         public string CleanNewFolderPath { private get; set; }
+        private readonly IEntityIdFactory _entityIdFactory;
+        private readonly ISterilizeStringFactory _sterilizeStringFactory;
 
-        private static string SterilizeString(string property)
+        public ActionJackson(
+            ISterilizeStringFactory sterilizeStringFactory, 
+            IEntityIdFactory entityIdFactory)
         {
-            if (string.IsNullOrEmpty(property)) return string.Empty;
-
-            var regex = new Regex("[^a-zA-Z0-9 ]").Replace(property, string.Empty).Trim();
-            regex = regex.Replace(".", string.Empty);
-            return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(regex);
+            _sterilizeStringFactory = sterilizeStringFactory;
+            _entityIdFactory = entityIdFactory;
         }
 
         private void CreateArtistFolder(Song song)
@@ -80,10 +81,9 @@ namespace MusicSorter
                 if (string.IsNullOrEmpty(song.FilePath)) continue;
                 if (string.IsNullOrEmpty(song.Album)) continue;
 
-                var albumName = SterilizeString(song.Album);
                 var combinedName = song.HasArtist
-                    ? Path.Combine(CleanNewFolderPath, song.Artist, albumName)
-                    : Path.Combine(CleanNewFolderPath, unknownArtist, albumName);
+                    ? Path.Combine(CleanNewFolderPath, song.Artist, song.Album)
+                    : Path.Combine(CleanNewFolderPath, unknownArtist, song.Album);
 
                 var combinedPath = Path.Combine(combinedName, Path.GetFileName(song.FilePath));
 
@@ -110,8 +110,6 @@ namespace MusicSorter
 
         private void GetSongInformationForAllFilesInFolder(string folder)
         {
-            var factory = new EntityIdFactory();
-
             foreach (var file in Directory.GetFiles(folder))
             {
                 try
@@ -120,10 +118,10 @@ namespace MusicSorter
 
                     var songInformation = new Song
                     {
-                        SongId = factory.Create(ListOfSongs),
-                        Album = SterilizeString(fileInformation.Tag.Album),
-                        Artist = SterilizeString(fileInformation.Tag.FirstAlbumArtist),
-                        Name = SterilizeString(fileInformation.Tag.Title),
+                        SongId = _entityIdFactory.Create(ListOfSongs),
+                        Album = _sterilizeStringFactory.CleanString(fileInformation.Tag.Album),
+                        Artist = _sterilizeStringFactory.CleanString(fileInformation.Tag.FirstAlbumArtist),
+                        Name = _sterilizeStringFactory.CleanString(fileInformation.Tag.Title),
                         FilePath = Path.GetFullPath(file),
                         HasArtist = !string.IsNullOrEmpty(fileInformation.Tag.FirstAlbumArtist)
                     };

@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Bootstrap;
+using Bootstrap.Ninject;
+using Ninject;
 using static System.Console;
 using static MusicSorter.CacheXml;
 
@@ -10,6 +13,12 @@ namespace MusicSorter
     {
         private static void Main()
         {
+            Bootstrapper.With.Ninject().Start();
+            var kernel = (IKernel)Bootstrapper.Container;
+
+            kernel.Bind<ISterilizeStringFactory>().To<SterilizeStringFactory>();
+            kernel.Bind<IEntityIdFactory>().To<EntityIdFactory>();
+
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
@@ -55,7 +64,6 @@ namespace MusicSorter
             ribs.AddSongsToFolders(count);
 
             stopWatch.Stop();
-
 
             ReadLine();
         }

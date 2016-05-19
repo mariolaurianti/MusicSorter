@@ -52,6 +52,30 @@
     <StartupObject>MusicSorter.MusicSorterMain</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bootstrapper, Version=2.0.3.13, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bootstrapper.2.0.3.13\lib\Net40\Bootstrapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Bootstrapper.Ninject, Version=2.0.3.13, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bootstrapper.Ninject.2.0.3.13\lib\Net40\Bootstrapper.Ninject.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CommonServiceLocator.NinjectAdapter.Unofficial, Version=3.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.NinjectAdapter.Unofficial.3.2.2.0\lib\Net40\CommonServiceLocator.NinjectAdapter.Unofficial.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject.Extensions.Conventions, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.Extensions.Conventions.3.2.0.0\lib\net45-full\Ninject.Extensions.Conventions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="policy.2.0.taglib-sharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=MSIL">
       <HintPath>..\packages\taglib.2.1.0.0\lib\policy.2.0.taglib-sharp.dll</HintPath>
       <Private>True</Private>
@@ -74,11 +98,14 @@
     <Compile Include="ActionJackson.cs" />
     <Compile Include="EntityIdFactory.cs" />
     <Compile Include="HelperMethods.cs" />
+    <Compile Include="IEntityIdFactory.cs" />
+    <Compile Include="ISterilizeStringFactory.cs" />
     <Compile Include="MusicSorterMain.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CacheXml.cs" />
     <Compile Include="Song.cs" />
+    <Compile Include="SterilizeStringFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace MusicSorter
 {
-    public class EntityIdFactory
+    public class EntityIdFactory : IEntityIdFactory
     {
         public int Create(List<Song> files)
         {
