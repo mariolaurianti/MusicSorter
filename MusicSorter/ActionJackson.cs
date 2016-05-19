@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using MusicSorter.Factories.Interfaces;
 using TagLib;
 using File = System.IO.File;
 

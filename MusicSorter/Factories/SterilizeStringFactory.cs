@@ -1,7 +1,8 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
+using MusicSorter.Factories.Interfaces;
 
-namespace MusicSorter
+namespace MusicSorter.Factories
 {
     public class SterilizeStringFactory : ISterilizeStringFactory
     {

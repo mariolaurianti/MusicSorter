@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MusicSorter.Factories.Interfaces;
 
-namespace MusicSorter
+namespace MusicSorter.Factories
 {
     public class EntityIdFactory : IEntityIdFactory
     {
