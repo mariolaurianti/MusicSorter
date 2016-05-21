@@ -1,8 +1,7 @@
+using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using MusicSorter.Factories.Interfaces;
 using TagLib;
 using File = System.IO.File;
@@ -13,52 +12,32 @@ namespace MusicSorter
     {
         public List<Song> ListOfSongs { get; set; }
         public string MessyFolderPath { get; set; }
-        public string CleanNewFolderPath { private get; set; }
+        public string NewFolderDestinationPath { private get; set; }
         private readonly IEntityIdFactory _entityIdFactory;
         private readonly ISterilizeStringFactory _sterilizeStringFactory;
+        private readonly ICreateFolderFactory _createFolderFactory;
 
         public ActionJackson(
             ISterilizeStringFactory sterilizeStringFactory, 
-            IEntityIdFactory entityIdFactory)
+            IEntityIdFactory entityIdFactory, 
+            ICreateFolderFactory createFolderFactory)
         {
             _sterilizeStringFactory = sterilizeStringFactory;
             _entityIdFactory = entityIdFactory;
-        }
-
-        private void CreateArtistFolder(Song song)
-        {
-            var newFolderPath = Path.Combine(CleanNewFolderPath, song.Artist);
-
-            Directory.CreateDirectory(newFolderPath);
-
-            if (!string.IsNullOrEmpty(song.Album))
-                CreateAlbumFolder(song, song.HasArtist, song.Artist);
-        }
-
-        private void CreateAlbumFolder(Song song, bool fromArtist, string artistClean = null)
-        {
-            var newFolderPath = fromArtist
-                ? Path.Combine($@"{CleanNewFolderPath}\", $@"{artistClean}\", song.Album)
-                : Path.Combine($@"{CleanNewFolderPath}\Unknown Artist", song.Album);
-
-            Directory.CreateDirectory(newFolderPath);
+            _createFolderFactory = createFolderFactory;
         }
 
         public void CreateFolders()
         {
             foreach (var song in ListOfSongs)
             {
-                if (song.HasArtist)
-                    CreateArtistFolder(song);
-                else if (!string.IsNullOrEmpty(song.Album))
-                    CreateAlbumFolder(song, false);
+                _createFolderFactory.CreateFolder(song, NewFolderDestinationPath);
             }
         }
 
         private void CheckForDuplicate(string songTitle)
         {
-            var listOfDuplicates =
-                ListOfSongs.Where(x => !string.IsNullOrEmpty(x.Name) && x.Name.Equals(songTitle)).ToList();
+            var listOfDuplicates = ListOfSongs.Where(x => !string.IsNullOrEmpty(x.Name) && x.Name.Equals(songTitle)).ToList();
 
             if (listOfDuplicates.Count.Equals(1)) return;
 
@@ -82,19 +61,28 @@ namespace MusicSorter
                 if (string.IsNullOrEmpty(song.FilePath)) continue;
                 if (string.IsNullOrEmpty(song.Album)) continue;
 
-                var combinedName = song.HasArtist
-                    ? Path.Combine(CleanNewFolderPath, song.Artist, song.Album)
-                    : Path.Combine(CleanNewFolderPath, unknownArtist, song.Album);
-
-                var combinedPath = Path.Combine(combinedName, Path.GetFileName(song.FilePath));
+                var combinedPath = ConstructNewPath(song, unknownArtist);
 
                 CheckForDuplicate(song.Name);
-
-                if (!File.Exists(combinedPath))
-                    File.Copy(song.FilePath, combinedPath);
+                CopyFileToFolder(combinedPath, song);
 
                 HelperMethods.DrawTextProgressBar(song.SongId, count);
             }
+        }
+
+        private string ConstructNewPath(Song song, string unknownArtist)
+        {
+            var combinedName = song.HasArtist
+                ? Path.Combine(NewFolderDestinationPath, song.Artist, song.Album)
+                : Path.Combine(NewFolderDestinationPath, unknownArtist, song.Album);
+
+            return song.FilePath != null ? Path.Combine(combinedName, Path.GetFileName(song.FilePath)) : null;
+        }
+
+        private static void CopyFileToFolder(string combinedPath, Song song)
+        {
+            if (!File.Exists(combinedPath))
+                File.Copy(song.FilePath, combinedPath);
         }
 
         public void ImportSongInformation(string folderPath)
@@ -116,6 +104,7 @@ namespace MusicSorter
                 try
                 {
                     var fileInformation = TagLib.File.Create(file);
+                    if(fileInformation.PossiblyCorrupt) continue;
 
                     var songInformation = new Song
                     {

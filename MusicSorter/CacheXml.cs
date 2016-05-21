@@ -11,6 +11,9 @@ namespace MusicSorter
         private const string _cacheXmlFile = "ListOfSongsXML";
         public static bool DoesCacheExists => File.Exists(_cacheXmlFile);
         public static bool IsCacheInSync => ValidateCache();
+        private static string TempFolderPath = Path.GetTempPath();
+        private static string CacheFilePath = $@"{TempFolderPath}\{_cacheXmlFile}";
+
 
         public static void SaveData(object obj, string filename)
         {
@@ -25,7 +28,6 @@ namespace MusicSorter
             if (!DoesCacheExists) return null;
 
             var serializer = new XmlSerializer(typeof(List<Song>));
-           
             using (FileStream stream = File.OpenRead(_cacheXmlFile))
             {
                 List<Song> dezerializedList = (List<Song>) serializer.Deserialize(stream);
@@ -35,7 +37,7 @@ namespace MusicSorter
 
         public static void DeleteCache()
         {
-            //TODO
+            File.Delete(CacheFilePath);
         }
 
         public static bool ValidateCache()
@@ -47,6 +49,11 @@ namespace MusicSorter
         public static void UpdateCache()
         {
             
+        }
+
+        public static void SaveToCache(ActionJackson ribs)
+        {
+            SaveData(ribs.ListOfSongs, CacheFilePath);
         }
     }
 }

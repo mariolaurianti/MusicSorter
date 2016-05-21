@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using Bootstrap;
 using Bootstrap.Ninject;
 using MusicSorter.Factories.Interfaces;
@@ -18,31 +17,41 @@ namespace MusicSorter
             Bootstrapper.With.Ninject().Start();
             var kernel = (IKernel)Bootstrapper.Container;
 
-            var stopWatch = new Stopwatch();
-            stopWatch.Start();
+            var sterilizeStringFactory = kernel.Get<ISterilizeStringFactory>();
+            var entityIdFactory = kernel.Get<IEntityIdFactory>();
+            var createFolderFactory = kernel.Get<ICreateFolderFactory>();
 
             const string fromPath = @"D:\Music\";
             const string toPath = @"D:\Sorted Music 3";
 
-            var ribs = new ActionJackson(kernel.Get<ISterilizeStringFactory>(), kernel.Get<IEntityIdFactory>())
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+            
+            var ribs = new ActionJackson(
+                sterilizeStringFactory, 
+                entityIdFactory,
+                createFolderFactory)
             {
                 MessyFolderPath = Path.GetFullPath(fromPath),
-                CleanNewFolderPath = Path.GetFullPath(toPath),
+                NewFolderDestinationPath = Path.GetFullPath(toPath),
                 ListOfSongs = new List<Song>()
             };
 
+            ValidateCache();
+            //DeleteCache();
+
             if (!DoesCacheExists)
             {
-                WriteLine("Retrieving Song Information. . .");
+                WriteLine("Retrieving Song Information...");
                 ribs.ImportSongInformation(ribs.MessyFolderPath);
-                
-                SaveData(ribs.ListOfSongs, "ListOfSongsXML");
+
+                SaveToCache(ribs);
             }
             else
             {
                 if (IsCacheInSync)
                 {
-                    WriteLine("Reading From Cache. . .");
+                    WriteLine("Reading From Cache...");
                     ribs.ListOfSongs = LoadCachedData();
                 }
                 else
@@ -52,14 +61,14 @@ namespace MusicSorter
                 }
             }
 
-            WriteLine("Creating Folders. . .");
+            WriteLine("Creating Folders...");
             ribs.CreateFolders();
 
             WriteLine($"Time Elapsed: {stopWatch.Elapsed} seconds");
             
             var count = ribs.ListOfSongs.Count;
 
-            WriteLine("Sorting Songs Into Folders. . . ");
+            WriteLine("Sorting Songs Into Folders...");
             ribs.AddSongsToFolders(count);
 
             stopWatch.Stop();
