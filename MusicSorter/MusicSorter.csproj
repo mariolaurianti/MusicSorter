@@ -113,6 +113,7 @@
     <Compile Include="Factories\SterilizeStringFactory.cs" />
     <Compile Include="FolderType.cs" />
     <Compile Include="HelperMethods.cs" />
+    <Compile Include="IConsoleSpiner.cs" />
     <Compile Include="MusicSorterMain.cs" />
     <Compile Include="NinjectRegistration.cs" />
     <Compile Include="Properties\Annotations.cs" />

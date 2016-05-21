@@ -68,13 +68,12 @@ namespace MusicSorter
                 ListOfSongs = new List<Song>()
             };
 
-            //DeleteCache();
+            CacheXml.DeleteCache();
 
             if (!CacheXml.DoesCacheExists)
             {
                 Console.WriteLine("Retrieving Song Information...");
                 ribs.ImportSongInformation(ribs.MessyFolderPath);
-
                 CacheXml.SaveToCache(ribs);
             }
             else
