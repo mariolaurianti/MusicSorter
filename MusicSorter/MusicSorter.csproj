@@ -111,6 +111,7 @@
     <Compile Include="Factories\Interfaces\IEntityIdFactory.cs" />
     <Compile Include="Factories\Interfaces\ISterilizeStringFactory.cs" />
     <Compile Include="Factories\SterilizeStringFactory.cs" />
+    <Compile Include="FolderType.cs" />
     <Compile Include="HelperMethods.cs" />
     <Compile Include="MusicSorterMain.cs" />
     <Compile Include="NinjectRegistration.cs" />

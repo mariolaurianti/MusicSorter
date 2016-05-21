@@ -13,29 +13,61 @@ namespace MusicSorter
     {
         private static void Main()
         {
+            //var musicFolderPath = GetUserFolderPath(FolderType.Music_Folder);
+            //VerifyPath(musicFolderPath, FolderType.Music_Folder);
+
+            //var newDestinationFolderPath = GetUserFolderPath(FolderType.New_Destination_Folder);
+            //VerifyPath(newDestinationFolderPath, FolderType.New_Destination_Folder);
+
+            //Program_Start(musicFolderPath, newDestinationFolderPath);
+
+            const string fromPath = @"D:\Music\";
+            const string toPath = @"D:\Sorted Music 3";
+            
+            Program_Start(fromPath, toPath);
+        }
+
+        private static void VerifyPath(string folderPath, FolderType folderType)
+        {
+            Console.WriteLine($"Is {folderPath} the correct path? [yes/no]");
+            var answer = Console.ReadLine();
+
+            if (answer == null) return;
+
+            if (!answer.Equals("yes") || answer.Equals("Yes") || answer.Equals("YES"))
+                GetUserFolderPath(folderType);
+        }
+
+
+        private static string GetUserFolderPath(FolderType folderType)
+        {
+            Console.Write($"Enter path to [ {folderType} ] folder: ");
+            var musicFolderPath = Console.ReadLine();
+            return musicFolderPath;
+        }
+
+        private static void Program_Start(string musicFolderPath, string newDestinationFolderPath)
+        {
             Bootstrapper.With.Ninject().Start();
-            var kernel = (IKernel)Bootstrapper.Container;
+            var kernel = (IKernel) Bootstrapper.Container;
 
             var sterilizeStringFactory = kernel.Get<ISterilizeStringFactory>();
             var entityIdFactory = kernel.Get<IEntityIdFactory>();
             var createFolderFactory = kernel.Get<ICreateFolderFactory>();
-
-            const string fromPath = @"D:\Music\";
-            const string toPath = @"D:\Sorted Music 3";
-
+            
             var stopWatch = new Stopwatch();
             stopWatch.Start();
-            
+
             var ribs = new ActionJackson(
-                sterilizeStringFactory, 
+                sterilizeStringFactory,
                 entityIdFactory,
                 createFolderFactory)
             {
-                MessyFolderPath = Path.GetFullPath(fromPath),
-                NewFolderDestinationPath = Path.GetFullPath(toPath),
+                MessyFolderPath = Path.GetFullPath(musicFolderPath),
+                NewFolderDestinationPath = Path.GetFullPath(newDestinationFolderPath),
                 ListOfSongs = new List<Song>()
             };
-            
+
             //DeleteCache();
 
             if (!CacheXml.DoesCacheExists)
@@ -47,7 +79,7 @@ namespace MusicSorter
             }
             else
             {
-                if(!CacheXml.IsCacheInSync)
+                if (!CacheXml.IsCacheInSync)
                     CacheXml.UpdateCache();
 
                 Console.WriteLine("Reading From Cache...");
@@ -58,7 +90,7 @@ namespace MusicSorter
             ribs.CreateFolders();
 
             Console.WriteLine($"Time Elapsed: {stopWatch.Elapsed} seconds");
-            
+
             var count = ribs.ListOfSongs.Count;
 
             Console.WriteLine("Sorting Songs Into Folders...");
