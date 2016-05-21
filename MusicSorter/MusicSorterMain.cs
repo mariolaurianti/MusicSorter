@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using Bootstrap;
 using Bootstrap.Ninject;
 using MusicSorter.Factories.Interfaces;
 using Ninject;
-using static System.Console;
-using static MusicSorter.CacheXml;
 
 namespace MusicSorter
 {
@@ -36,44 +35,38 @@ namespace MusicSorter
                 NewFolderDestinationPath = Path.GetFullPath(toPath),
                 ListOfSongs = new List<Song>()
             };
-
-            ValidateCache();
+            
             //DeleteCache();
 
-            if (!DoesCacheExists)
+            if (!CacheXml.DoesCacheExists)
             {
-                WriteLine("Retrieving Song Information...");
+                Console.WriteLine("Retrieving Song Information...");
                 ribs.ImportSongInformation(ribs.MessyFolderPath);
 
-                SaveToCache(ribs);
+                CacheXml.SaveToCache(ribs);
             }
             else
             {
-                if (IsCacheInSync)
-                {
-                    WriteLine("Reading From Cache...");
-                    ribs.ListOfSongs = LoadCachedData();
-                }
-                else
-                {
-                    UpdateCache();
-                    ribs.ListOfSongs = LoadCachedData();
-                }
+                if(!CacheXml.IsCacheInSync)
+                    CacheXml.UpdateCache();
+
+                Console.WriteLine("Reading From Cache...");
+                ribs.ListOfSongs = CacheXml.LoadCachedData();
             }
 
-            WriteLine("Creating Folders...");
+            Console.WriteLine("Creating Folders...");
             ribs.CreateFolders();
 
-            WriteLine($"Time Elapsed: {stopWatch.Elapsed} seconds");
+            Console.WriteLine($"Time Elapsed: {stopWatch.Elapsed} seconds");
             
             var count = ribs.ListOfSongs.Count;
 
-            WriteLine("Sorting Songs Into Folders...");
+            Console.WriteLine("Sorting Songs Into Folders...");
             ribs.AddSongsToFolders(count);
 
             stopWatch.Stop();
 
-            ReadLine();
+            Console.ReadLine();
         }
     }
 }
