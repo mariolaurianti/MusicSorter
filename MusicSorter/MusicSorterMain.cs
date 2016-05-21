@@ -13,18 +13,15 @@ namespace MusicSorter
     {
         private static void Main()
         {
-            //var musicFolderPath = GetUserFolderPath(FolderType.Music_Folder);
-            //VerifyPath(musicFolderPath, FolderType.Music_Folder);
+            var musicFolderPath = GetUserFolderPath(FolderType.Music_Folder);
+            var newDestinationFolderPath = GetUserFolderPath(FolderType.New_Destination_Folder);
 
-            //var newDestinationFolderPath = GetUserFolderPath(FolderType.New_Destination_Folder);
-            //VerifyPath(newDestinationFolderPath, FolderType.New_Destination_Folder);
+            Program_Start(musicFolderPath, newDestinationFolderPath);
 
-            //Program_Start(musicFolderPath, newDestinationFolderPath);
+            //const string fromPath = @"D:\Music\";
+            //const string toPath = @"D:\Sorted Music 3";
 
-            const string fromPath = @"D:\Music\";
-            const string toPath = @"D:\Sorted Music 3";
-            
-            Program_Start(fromPath, toPath);
+            //Program_Start(fromPath, toPath);
         }
 
         private static void VerifyPath(string folderPath, FolderType folderType)
@@ -43,6 +40,9 @@ namespace MusicSorter
         {
             Console.Write($"Enter path to [ {folderType} ] folder: ");
             var musicFolderPath = Console.ReadLine();
+
+            VerifyPath(musicFolderPath, folderType);
+
             return musicFolderPath;
         }
 
